@@ -65,9 +65,9 @@ public class GalPlugin implements FlutterPlugin, MethodCallHandler, ActivityAwar
             case "putImage": {
                 new Thread(() -> {
                     try {
-                        putMedia(call.argument("path"), call.argument("album"),
+                        String savedPath = putMedia(call.argument("path"), call.argument("album"),
                                 call.method.contains("Image"));
-                        new Handler(Looper.getMainLooper()).post(() -> result.success(null));
+                        new Handler(Looper.getMainLooper()).post(() -> result.success(savedPath));
                     } catch (Exception e) {
                         handleError(e, result);
                     }
@@ -77,9 +77,9 @@ public class GalPlugin implements FlutterPlugin, MethodCallHandler, ActivityAwar
             case "putImageBytes": {
                 new Thread(() -> {
                     try {
-                        putMediaBytes(call.argument("bytes"), call.argument("album"),
+                        String savedPath = putMediaBytes(call.argument("bytes"), call.argument("album"),
                                 call.argument("name"));
-                        new Handler(Looper.getMainLooper()).post(() -> result.success(null));
+                        new Handler(Looper.getMainLooper()).post(() -> result.success(savedPath));
                     } catch (Exception e) {
                         handleError(e, result);
                     }
@@ -114,7 +114,7 @@ public class GalPlugin implements FlutterPlugin, MethodCallHandler, ActivityAwar
         }
     }
 
-    private void putMedia(String path, String album, boolean isImage)
+    private String putMedia(String path, String album, boolean isImage)
             throws IOException, SecurityException, FileNotFoundException {
         File file = new File(path);
         String name = file.getName();
@@ -122,25 +122,32 @@ public class GalPlugin implements FlutterPlugin, MethodCallHandler, ActivityAwar
         if (dotIndex == -1) throw new FileNotFoundException("Extension not found.");
 
         try (InputStream in = new FileInputStream(file)) {
-            writeData(in, isImage, name.substring(0, dotIndex), name.substring(dotIndex), album);
+           return writeData(in, isImage, name.substring(0, dotIndex), name.substring(dotIndex), album);
         }
     }
 
-    private void putMediaBytes(byte[] bytes, String album, String name)
+    private String putMediaBytes(byte[] bytes, String album, String name)
             throws IOException, SecurityException {
         ImageFormat imageFormat = Imaging.guessFormat(bytes);
         String extension = "." + imageFormat.getDefaultExtension().toLowerCase();
         try (InputStream in = new ByteArrayInputStream(bytes)) {
-            writeData(in, true, name, extension, album);
+          return writeData(in, true, name, extension, album);
         }
     }
 
-    private void writeData(InputStream in, boolean isImage, String name, String extension,
+    private String writeData(InputStream in, boolean isImage, String name, String extension,
             String album) throws IOException, SecurityException, FileNotFoundException {
         ContentResolver resolver = pluginBinding.getApplicationContext().getContentResolver();
         ContentValues values = createContentValues(isImage, name, extension, album);
         Uri uri = getUniqueFileUri(resolver, values, isImage, name, extension);
-
+/////////////////
+        String savedPath;
+        if (USE_EXTERNAL_STORAGE) {
+            savedPath = values.getAsString(MediaStore.MediaColumns.DATA);
+        } else {
+            savedPath = uri.toString();
+        }
+///////////////////
         try (OutputStream out = resolver.openOutputStream(uri)) {
             byte[] buffer = new byte[8192];
             int bytesRead;
@@ -148,6 +155,8 @@ public class GalPlugin implements FlutterPlugin, MethodCallHandler, ActivityAwar
                 out.write(buffer, 0, bytesRead);
             }
         }
+
+        return savedPath;
     }
 
     // This is necessary because FileUtils.java only checks up to 31 times to generate unique names.

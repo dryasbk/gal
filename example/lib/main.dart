@@ -20,6 +20,8 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   bool toAlbum = false;
+  String? newPath = ' nothing';
+  String? newPath2 = '';
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -40,7 +42,9 @@ class _AppState extends State<App> {
                 FilledButton(
                   onPressed: () async {
                     final path = await getFilePath('assets/done.mp4');
-                    await Gal.putVideo(path, album: album);
+                    // await Gal.putVideo(path, album: album);
+                    newPath2 = await Gal.putVideo(path, album: album);
+                    log('Request Granted:>>>>> $newPath');
                     showSnackbar();
                   },
                   child: const Text('Save Video from file path'),
@@ -48,7 +52,16 @@ class _AppState extends State<App> {
                 FilledButton(
                   onPressed: () async {
                     final path = await getFilePath('assets/done.jpg');
-                    await Gal.putImage(path, album: album);
+                    // await Gal.putImage(path, album: album);
+                    newPath = await Gal.putImage(path, album: album);
+                    if (newPath != null) {
+                      setState(() {
+                        log('Request Granted:>>>>> $newPath');
+
+                        newPath = newPath!.replaceFirst("ph://", "");
+                      });
+                      log('Request Granted:>>>>> $newPath');
+                    }
                     showSnackbar();
                   },
                   child: const Text('Save Image from file path'),
@@ -56,19 +69,29 @@ class _AppState extends State<App> {
                 FilledButton(
                   onPressed: () async {
                     final bytes = await getBytesData('assets/done.jpg');
-                    await Gal.putImageBytes(bytes, album: album);
+                    newPath = await Gal.putImageBytes(bytes, album: album);
+                    setState(() {
+                      log('Request Granted:>>>>> $newPath');
+
+                      // newPath = newPath!.replaceFirst("ph://", "");
+                    });
+                    log('Request Granted:>>>>> $newPath');
                     showSnackbar();
                   },
                   child: const Text('Save Image from bytes'),
                 ),
                 FilledButton(
                   onPressed: () async {
-                    final path = '${Directory.systemTemp.path}/done.jpg';
+                    final path = '${Directory.systemTemp.path}/rose.jpg';
                     await Dio().download(
-                      'https://github.com/natsuk4ze/gal/raw/main/example/assets/done.jpg',
+                      'https://images.pexels.com/photos/56866/garden-rose-red-pink-56866.jpeg?auto=compress&cs=tinysrgb&w=600',
                       path,
                     );
-                    await Gal.putImage(path, album: album);
+
+                    setState(() {});
+                    newPath = await Gal.putImage(path, album: album);
+                    // print('>>>>> $newPath');
+                    log('Request Granted:>>>>> $newPath');
                     showSnackbar();
                   },
                   child: const Text('Download Image'),
@@ -80,7 +103,14 @@ class _AppState extends State<App> {
                       'https://github.com/natsuk4ze/gal/raw/main/example/assets/done.mp4',
                       path,
                     );
-                    await Gal.putVideo(path, album: album);
+                    newPath2 = await Gal.putVideo(path, album: album);
+                    setState(() {
+                      print('>>>>> $newPath');
+
+                      // newPath = newPath!.replaceFirst("ph://", "");
+                    });
+                    print('>>>>> $newPath');
+                    // print('>>>>> $newPath');
                     showSnackbar();
                   },
                   child: const Text('Download Video'),
@@ -100,6 +130,23 @@ class _AppState extends State<App> {
                   },
                   child: const Text('Request Access'),
                 ),
+                const SizedBox(
+                  height: 6,
+                ),
+//                 newPath != null
+//                 Text(newPath!)
+//                 Image.file(
+//                     File(newPath!),
+//                     height: 100,
+//                     width: 100,
+//                     fit: BoxFit.fill,
+//                     alignment: Alignment.center,
+//                   )
+//                 : Container(
+//                     color: Colors.amber,
+//                     height: 10,
+//                     width: 20,
+//                   ),
               ],
             ),
           ),
@@ -108,7 +155,7 @@ class _AppState extends State<App> {
     );
   }
 
-  String? get album => toAlbum ? 'Album' : null;
+  String? get album => toAlbum ? 'Album2' : null;
 
   void showSnackbar() {
     final context = navigatorKey.currentContext;

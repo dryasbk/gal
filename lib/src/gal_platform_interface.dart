@@ -10,17 +10,17 @@ base class GalPlatform {
 
   /// throw [UnimplementedError] when Plugin [MethodChannelGal] did not
   /// define [putVideo].
-  Future<void> putVideo(String path, {String? album}) =>
+  Future<String?> putVideo(String path, {String? album}) =>
       throw UnimplementedError('putVideo() has not been implemented.');
 
   /// throw [UnimplementedError] when Plugin [MethodChannelGal] did not
   /// define [putImage].
-  Future<void> putImage(String path, {String? album}) =>
+  Future<String?> putImage(String path, {String? album}) =>
       throw UnimplementedError('putImage() has not been implemented.');
 
   /// throw [UnimplementedError] when Plugin [MethodChannelGal] did not
   /// define [putImageBytes].
-  Future<void> putImageBytes(Uint8List bytes,
+  Future<String?> putImageBytes(Uint8List bytes,
           {String? album, required String name}) =>
       throw UnimplementedError('putImageBytes() has not been implemented.');
 

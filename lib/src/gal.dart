@@ -19,7 +19,7 @@ final class Gal {
   /// Throws an [GalException] If you do not have access premission or
   /// if an error occurs during saving.
   /// See: [Formats](https://github.com/natsuk4ze/gal/wiki/Formats)
-  static Future<void> putVideo(String path, {String? album}) async =>
+  static Future<String?> putVideo(String path, {String? album}) async =>
       GalPlatform.instance.putVideo(path, album: album);
 
   /// Save a image to the gallery from file [path].
@@ -32,7 +32,7 @@ final class Gal {
   /// Throws an [GalException] If you do not have access premission or
   /// if an error occurs during saving.
   /// See: [Formats](https://github.com/natsuk4ze/gal/wiki/Formats)
-  static Future<void> putImage(String path, {String? album}) async =>
+  static Future<String?> putImage(String path, {String? album}) async =>
       GalPlatform.instance.putImage(path, album: album);
 
   /// Save a image to the gallery from [Uint8List].
@@ -45,7 +45,7 @@ final class Gal {
   /// Throws an [GalException] If you do not have access premission or
   /// if an error occurs during saving.
   /// See: [Formats](https://github.com/natsuk4ze/gal/wiki/Formats)
-  static Future<void> putImageBytes(Uint8List bytes,
+  static Future<String?> putImageBytes(Uint8List bytes,
           {String? album, String name = 'image'}) async =>
       GalPlatform.instance.putImageBytes(bytes, album: album, name: name);
 
